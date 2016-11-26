@@ -1,4 +1,6 @@
 require 'cgi'
+require 'citeproc'
+require 'csl/styles'
 
 module BibMarkdown
   class Document
@@ -31,6 +33,8 @@ module BibMarkdown
 
         "#{link} #{reflink}"
       end
+
+      "#{markdown}\n\n#{references_html reference_ids}".rstrip
     end
 
     protected
@@ -42,6 +46,27 @@ module BibMarkdown
       attrs[:href] = url
       attrs = attrs.map { |attr, value| %Q{#{attr}="#{h value}"} }
       %Q{<a #{attrs.join ' '}>#{html}</a>}
+    end
+
+    def references_html reference_ids
+      if reference_ids.empty?
+        ''
+      else
+        html =  %Q{<h2 id="references">References</h2>\n}
+        html += %Q{<dl class="references">\n}
+        reference_ids.each do |key, id|
+          html += %Q{  <dt id="ref-#{id}">[#{id}]</dt>\n}
+          html += %Q{  <dd>#{reference_html key}</dd>\n}
+        end
+        html += %Q{</dl>\n}
+      end
+    end
+
+    def reference_html key
+      processor = CiteProc::Processor.new style: 'elsevier-harvard', format: 'html'
+      processor << @entries[key].to_citeproc
+      citations = processor.render :bibliography, id: key
+      citations.first
     end
   end
 end
