@@ -39,7 +39,7 @@ module BibMarkdown
 
     protected
     def h text
-      CGI::escapeHTML(text)
+      CGI::escapeHTML(text || '')
     end
 
     def create_link html, url, attrs
