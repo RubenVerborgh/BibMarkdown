@@ -25,6 +25,7 @@ module BibMarkdown
 
         # Look up citation and its URL
         entry = @entries[key]
+        raise "Failed to generate references: entry '#{key}' does not exist." unless entry
         url = entry[:url] || ''
 
         # Create the reference
