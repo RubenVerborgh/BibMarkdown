@@ -13,7 +13,7 @@ module BibMarkdown
       reference_ids = {}
 
       # Replace all citations by links
-      markdown = @source.gsub %r{\[([^\]]+)\]\(cite:(\w+)\s+([^\)]+)\)} do |match|
+      markdown = @source.gsub %r{\[([^\]]*)\]\(cite:(\w+)\s+([^\)]+)\)} do |match|
         html = $1; rel = $2; key = $3
 
         # Look up or assign reference ID
@@ -25,15 +25,24 @@ module BibMarkdown
 
         # Look up citation and its URL
         entry = @entries[key]
-        url = entry[:url]
+        url = entry[:url] || ''
 
-        # Create the citation link
-        link = create_link html, url, rel: 'http://purl.org/spar/cito/' + rel
+        # Create the reference
         reflink = create_link "[#{reference_id}]", "#ref-#{reference_id}", class: 'reference'
 
-        "#{link} #{reflink}"
+        # If the text is empty, just output the reference
+        if html.empty?
+          reflink
+        # If there is no URL, just output the text with the reference
+        elsif url.empty?
+          "#{html} #{reflink}"
+        # Otherwise, output the link and the reference
+        else
+          "#{create_link html, url, rel: 'http://purl.org/spar/cito/' + rel} #{reflink}"
+        end
       end
 
+      # Append the reference list to the text
       "#{markdown}\n\n#{references_html reference_ids}".rstrip
     end
 
