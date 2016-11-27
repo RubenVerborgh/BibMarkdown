@@ -1,4 +1,6 @@
 ## BibMarkown
+[![bibmarkdown gem version](https://badge.fury.io/rb/bibmarkdown.svg)](https://rubygems.org/gems/bibmarkdown)
+
 BibMarkdown is a Ruby pre-processor for Markdown,
 adding support for citations
 realized by a BibTex back-end.
