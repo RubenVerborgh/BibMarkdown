@@ -40,6 +40,7 @@ a _References_ section will be added:
 ```ruby
 require 'bibmarkdown'
 require 'bibtex'
+require 'csl/styles'
 
 content = <<-md
 The way _clients_ and _servers_ exchange information on the Web
@@ -57,7 +58,8 @@ bibliography = <<-bib
 bib
 
 entries = BibTeX.parse(bibliography).entries
-document = BibMarkdown::Document.new(content, entries: entries)
+document = BibMarkdown::Document.new content,
+             entries: entries, style: 'elsevier-harvard'
 puts document.to_markdown
 ```
 

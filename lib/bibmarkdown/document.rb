@@ -7,6 +7,7 @@ module BibMarkdown
     def initialize(source, options)
       @source = source
       @entries = options[:entries]
+      @style = options[:style]
     end
 
     def to_markdown
@@ -73,7 +74,7 @@ module BibMarkdown
     end
 
     def reference_html key
-      processor = CiteProc::Processor.new style: 'elsevier-harvard', format: 'html'
+      processor = CiteProc::Processor.new style: @style, format: 'html'
       processor << @entries[key].to_citeproc
       citations = processor.render :bibliography, id: key
       citations.first
