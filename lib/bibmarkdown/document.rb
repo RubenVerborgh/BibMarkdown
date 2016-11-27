@@ -53,7 +53,7 @@ module BibMarkdown
       CGI::escapeHTML(text || '')
     end
 
-    def create_link html, url, attrs
+    def create_link html, url, attrs = {}
       attrs[:href] = url
       attrs = attrs.map { |attr, value| %Q{#{attr}="#{h value}"} }
       %Q{<a #{attrs.join ' '}>#{html}</a>}
@@ -74,10 +74,16 @@ module BibMarkdown
     end
 
     def reference_html key
+      # Render reference
       processor = CiteProc::Processor.new style: @style, format: 'html'
       processor << @entries[key].to_citeproc
       citations = processor.render :bibliography, id: key
-      citations.first
+      citation = citations.first
+
+      # Replace URLs by links
+      citation.gsub %r{https?://[^ ]+[^ .]} do |match|
+        create_link h(match), match
+      end
     end
   end
 end
