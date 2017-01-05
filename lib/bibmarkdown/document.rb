@@ -40,7 +40,7 @@ module BibMarkdown
           "#{html} #{reflink}"
         # Otherwise, output the link and the reference
         else
-          "#{create_link html, url, rel: 'http://purl.org/spar/cito/' + rel} #{reflink}"
+          "#{create_link html, url, property: 'http://purl.org/spar/cito/' + rel} #{reflink}"
         end
       end
 
