@@ -15,19 +15,23 @@ module BibMarkdown
 
       # Replace all citations by links
       markdown = @source.gsub %r{\[([^\]]*)\]\(cit[eo]:(\w+)\s+([^\)]+)\)} do |match|
-        text = $1; rel = $2; key = $3
-        ref = create_reference key
+        text = $1; rel = $2; keys = $3
 
-        # If the link text is empty, just output the reference
+        # Create the references
+        refs = keys.strip.split(/\s*,\s*/).map {|key| create_reference key }
+        raise "Missing reference key in #{match}" if refs.empty?
+        reflinks = refs.map{|r| r[:link]}.join ''
+
+        # If the link text is empty, output links to the references
         if text.empty?
-          ref[:link]
-        # If there is no URL, just output the text followed by the reference
-        elsif ref[:url].empty?
-          "#{text} #{ref[:link]}"
-        # Otherwise, output the linked text and the reference
+          reflinks
+        # If there is no URL, output the text followed by links to the references
+        elsif refs.first[:url].empty?
+          "#{text} #{reflinks}"
+        # Otherwise, output the linked text and the references
         else
           property = 'http://purl.org/spar/cito/' + rel
-          "#{create_link text, ref[:url], property: property} #{ref[:link]}"
+          "#{create_link text, refs.first[:url], property: property} #{reflinks}"
         end
       end
 
