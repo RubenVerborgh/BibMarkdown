@@ -11,44 +11,46 @@ module BibMarkdown
     end
 
     def to_markdown
-      reference_ids = {}
+      @references = {}
 
       # Replace all citations by links
       markdown = @source.gsub %r{\[([^\]]*)\]\(cit[eo]:(\w+)\s+([^\)]+)\)} do |match|
-        html = $1; rel = $2; key = $3
+        text = $1; rel = $2; key = $3
+        ref = create_reference key
 
-        # Look up or assign reference ID
-        if reference_ids.has_key? key
-          reference_id = reference_ids[key]
+        # If the link text is empty, just output the reference
+        if text.empty?
+          ref[:link]
+        # If there is no URL, just output the text followed by the reference
+        elsif ref[:url].empty?
+          "#{text} #{ref[:link]}"
+        # Otherwise, output the linked text and the reference
         else
-          reference_id = reference_ids[key] = reference_ids.length + 1
-        end
-
-        # Look up citation and its URL
-        entry = @entries[key]
-        raise "Failed to generate references: entry '#{key}' does not exist." unless entry
-        url = entry[:url] || ''
-
-        # Create the reference
-        reflink = create_link "[#{reference_id}]", "#ref-#{reference_id}", class: 'reference'
-
-        # If the text is empty, just output the reference
-        if html.empty?
-          reflink
-        # If there is no URL, just output the text with the reference
-        elsif url.empty?
-          "#{html} #{reflink}"
-        # Otherwise, output the link and the reference
-        else
-          "#{create_link html, url, property: 'http://purl.org/spar/cito/' + rel} #{reflink}"
+          property = 'http://purl.org/spar/cito/' + rel
+          "#{create_link text, ref[:url], property: property} #{ref[:link]}"
         end
       end
 
-      # Append the reference list to the text
-      "#{markdown}\n\n#{references_html reference_ids}".rstrip
+      # Append the reference list to the document
+      "#{markdown}\n\n#{references_html}".rstrip
     end
 
     protected
+    def create_reference key
+      return @references[key] if @references.has_key? key
+
+      # Look up citation and its URL
+      entry = @entries[key]
+      raise "Failed to generate references: entry '#{key}' does not exist." unless entry
+      url = entry[:url] || ''
+
+      # Assign an ID and create a link to the reference
+      id = @references.length + 1
+      link = create_link "[#{id}]", "#ref-#{id}", class: 'reference'
+
+      @references[key] = { id: id, url: url, link: link }
+    end
+
     def h text
       CGI::escapeHTML(text || '')
     end
@@ -59,14 +61,14 @@ module BibMarkdown
       %Q{<a #{attrs.join ' '}>#{html}</a>}
     end
 
-    def references_html reference_ids
-      if reference_ids.empty?
+    def references_html
+      if @references.empty?
         ''
       else
         html =  %Q{<h2 id="references">References</h2>\n}
         html += %Q{<dl class="references">\n}
-        reference_ids.each do |key, id|
-          html += %Q{  <dt id="ref-#{id}">[#{id}]</dt>\n}
+        @references.each do |key, ref|
+          html += %Q{  <dt id="ref-#{ref[:id]}">[#{ref[:id]}]</dt>\n}
           html += %Q{  <dd>#{reference_html key}</dd>\n}
         end
         html += %Q{</dl>\n}
