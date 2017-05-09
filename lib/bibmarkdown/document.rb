@@ -14,7 +14,7 @@ module BibMarkdown
       reference_ids = {}
 
       # Replace all citations by links
-      markdown = @source.gsub %r{\[([^\]]*)\]\(cite:(\w+)\s+([^\)]+)\)} do |match|
+      markdown = @source.gsub %r{\[([^\]]*)\]\(cit[eo]:(\w+)\s+([^\)]+)\)} do |match|
         html = $1; rel = $2; key = $3
 
         # Look up or assign reference ID
