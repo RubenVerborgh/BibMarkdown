@@ -50,7 +50,7 @@ module BibMarkdown
 
       # Assign an ID and create a link to the reference
       id = @references.length + 1
-      link = create_link "[#{id}]", "#ref-#{id}", class: 'reference'
+      link = create_link "\\[#{id}\\]", "#ref-#{id}", class: 'reference'
 
       @references[key] = { id: id, url: url, link: link }
     end
@@ -72,7 +72,7 @@ module BibMarkdown
         html =  %Q{<h2 id="references">References</h2>\n}
         html += %Q{<dl class="references">\n}
         @references.each do |key, ref|
-          html += %Q{  <dt id="ref-#{ref[:id]}">[#{ref[:id]}]</dt>\n}
+          html += %Q{  <dt id="ref-#{ref[:id]}">\[#{ref[:id]}\]</dt>\n}
           html += %Q{  <dd>#{reference_html key}</dd>\n}
         end
         html += %Q{</dl>\n}
