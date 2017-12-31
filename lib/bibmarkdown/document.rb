@@ -31,7 +31,7 @@ module BibMarkdown
         # Otherwise, output the linked text and the references
         else
           property = 'schema:citation http://purl.org/spar/cito/' + rel
-          "#{create_link text, refs.first[:url], property: property} #{reflinks}"
+          "#{create_element :a, text, href: refs.first[:url], property: property} #{reflinks}"
         end
       end
 
@@ -54,7 +54,7 @@ module BibMarkdown
 
       # Assign a reference number and create a link to the reference
       number = @references.length + 1
-      link = create_link "\\[#{number}\\]", "#ref-#{number}", class: 'reference'
+      link = create_element :a, "\\[#{number}\\]", href: "#ref-#{number}", class: 'reference'
 
       @references[key] = { number: number, url: url, link: link }
     end
@@ -63,10 +63,9 @@ module BibMarkdown
       CGI::escapeHTML(text || '')
     end
 
-    def create_link html, url, attrs = {}
-      attrs[:href] = url
+    def create_element tag, html, attrs = {}
       attrs = attrs.map { |attr, value| %Q{#{attr}="#{h value}"} }
-      %Q{<a #{attrs.join ' '}>#{html}</a>}
+      %Q{<#{tag} #{attrs.join ' '}>#{html}</#{tag}>}
     end
 
     def references_html
@@ -115,7 +114,7 @@ module BibMarkdown
 
       # Replace URLs by links
       citation.gsub %r{https?://[^ ]+[^ .]} do |match|
-        create_link h(match), match
+        create_element :a, h(match), href: match
       end
     end
   end
