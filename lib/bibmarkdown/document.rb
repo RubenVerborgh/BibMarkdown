@@ -77,7 +77,7 @@ module BibMarkdown
         html += %Q{<dl class="references">\n}
         @references.each do |key, ref|
           html += %Q{  <dt id="ref-#{ref[:id]}">\[#{ref[:id]}\]</dt>\n}
-          html += %Q{  <dd resource="#{reference_id key}">#{reference_html key}</dd>\n}
+          html += %Q{  <dd resource="#{reference_id key}" typeof="#{reference_type key}">#{reference_html key}</dd>\n}
         end
         html += %Q{</dl>\n}
       end
@@ -89,6 +89,21 @@ module BibMarkdown
         entry[:url] ||
         entry[:doi] && "https://dx.doi.org/#{entry[:doi]}" ||
         "##{key}"
+    end
+
+    def reference_type key
+      case find_entry(key).type
+      when :article, :inproceedings
+        'schema:Article'
+      when :book
+        'schema:Book'
+      when :incollection
+        'schema:Chapter'
+      when :mastersthesis, :phdthesis
+        'schema:Thesis'
+      else
+        'schema:CreativeWork'
+      end
     end
 
     def reference_html key
