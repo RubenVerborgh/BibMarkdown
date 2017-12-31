@@ -77,10 +77,18 @@ module BibMarkdown
         html += %Q{<dl class="references">\n}
         @references.each do |key, ref|
           html += %Q{  <dt id="ref-#{ref[:id]}">\[#{ref[:id]}\]</dt>\n}
-          html += %Q{  <dd>#{reference_html key}</dd>\n}
+          html += %Q{  <dd resource="#{reference_id key}">#{reference_html key}</dd>\n}
         end
         html += %Q{</dl>\n}
       end
+    end
+
+    def reference_id key
+      entry = find_entry key
+      entry[:id] ||
+        entry[:url] ||
+        entry[:doi] && "https://dx.doi.org/#{entry[:doi]}" ||
+        "##{key}"
     end
 
     def reference_html key
