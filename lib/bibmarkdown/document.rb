@@ -22,16 +22,24 @@ module BibMarkdown
         raise "Missing reference key in #{match}" if refs.empty?
         reflinks = refs.map{|r| r[:link]}.join ''
 
-        # If the link text is empty, output links to the references
+        # If the anchor text is empty, output reference links
         if text.empty?
           reflinks
-        # If there is no URL, output the text followed by links to the references
+        # If the reference has no URL, output the anchor text and append reference links
         elsif refs.first[:url].empty?
           "#{text} #{reflinks}"
-        # Otherwise, output the linked text and the references
+        # Otherwise, link the anchor text to the first reference URL and append reference links
         else
           property = 'schema:citation http://purl.org/spar/cito/' + rel
-          "#{create_element :a, text, href: refs.first[:url], property: property} #{reflinks}"
+          # Link to the first reference
+          first = refs.first
+          if first[:id] == first[:url]
+            "#{create_element :a, text, property: property, href: first[:url]} #{reflinks}"
+          # If the reference's ID is different from its URL, surround with an extra span
+          else
+            link = create_element :a, text, href: first[:url]
+            "#{create_element :span, link, property: property, resource: first[:id]} #{reflinks}"
+          end
         end
       end
 
@@ -56,7 +64,7 @@ module BibMarkdown
       number = @references.length + 1
       link = create_element :a, "\\[#{number}\\]", href: "#ref-#{number}", class: 'reference'
 
-      @references[key] = { number: number, url: url, link: link }
+      @references[key] = { id: reference_id(key), number: number, url: url, link: link }
     end
 
     def h text
@@ -85,8 +93,8 @@ module BibMarkdown
     def reference_id key
       entry = find_entry key
       entry[:id] ||
-        entry[:url] ||
         entry[:doi] && "https://dx.doi.org/#{entry[:doi]}" ||
+        entry[:url] ||
         "##{key}"
     end
 
