@@ -30,7 +30,7 @@ module BibMarkdown
           "#{text} #{reflinks}"
         # Otherwise, output the linked text and the references
         else
-          property = 'http://purl.org/spar/cito/' + rel
+          property = 'schema:citation http://purl.org/spar/cito/' + rel
           "#{create_link text, refs.first[:url], property: property} #{reflinks}"
         end
       end
