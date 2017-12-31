@@ -40,12 +40,16 @@ module BibMarkdown
     end
 
     protected
+    def find_entry key
+      raise "Reference '#{key}' does not exist." unless @entries.key?(key)
+      @entries[key]
+    end
+
     def create_reference key
       return @references[key] if @references.has_key? key
 
       # Look up citation and its URL
-      entry = @entries[key]
-      raise "Failed to generate references: entry '#{key}' does not exist." unless entry
+      entry = find_entry key
       url = entry[:url] || ''
 
       # Assign an ID and create a link to the reference
