@@ -114,9 +114,20 @@ module BibMarkdown
     end
 
     def reference_html key
-      # Render reference
+      # Prepare reference HTML renderer
       processor = CiteProc::Processor.new style: @style, format: 'html'
-      processor << @entries[key].to_citeproc
+      citeproc = @entries[key].to_citeproc
+      
+      # Make sure multiple last names stick together
+      (citeproc["author"] || citeproc["editor"]).each do |author|
+        if author.has_key? "non-dropping-particle"
+          author["family"] = "#{author["non-dropping-particle"]} #{author["family"]}"
+          author.delete "non-dropping-particle"
+        end
+      end
+      
+      # Render reference
+      processor << citeproc
       citations = processor.render :bibliography, id: key
       citation = citations.first
 
