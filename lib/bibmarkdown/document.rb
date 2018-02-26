@@ -119,7 +119,7 @@ module BibMarkdown
       citeproc = @entries[key].to_citeproc
 
       # Ensure multi-part last names stick together
-      (citeproc["author"] || citeproc["editor"]).each do |author|
+      (citeproc["author"] || citeproc["editor"] || []).each do |author|
         if author.has_key? "non-dropping-particle"
           author["family"] = "#{author["non-dropping-particle"]} #{author["family"]}"
           author.delete "non-dropping-particle"
