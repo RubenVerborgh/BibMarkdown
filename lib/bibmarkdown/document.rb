@@ -20,7 +20,7 @@ module BibMarkdown
         # Create the references
         refs = keys.strip.split(/\s*,\s*/).map {|key| create_reference key }
         raise "Missing reference key in #{match}" if refs.empty?
-        reflinks = refs.map{|r| r[:link]}.join ''
+        reflinks = create_element :span, "\\[" + (refs.map{|r| r[:link]}.join ",&thinsp;") + "\\]", class: 'references'
 
         # If the anchor text is empty, output reference links
         if text.empty?
@@ -62,7 +62,7 @@ module BibMarkdown
 
       # Assign a reference number and create a link to the reference
       number = @references.length + 1
-      link = create_element :a, "\\[#{number}\\]", href: "#ref-#{number}", class: 'reference'
+      link = create_element :a, "#{number}", href: "#ref-#{number}"
 
       @references[key] = { id: reference_id(key), number: number, url: url, link: link }
     end
