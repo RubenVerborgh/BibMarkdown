@@ -20,7 +20,7 @@ module BibMarkdown
         # Create the references
         refs = keys.strip.split(/\s*,\s*/).map {|key| create_reference key }
         raise "Missing reference key in #{match}" if refs.empty?
-        reflinks = create_element :span, "\\[" + (refs.map{|r| r[:link]}.join ",&thinsp;") + "\\]", class: 'reference'
+        reflinks = create_element :span, "\\[" + (refs.map{|r| r[:link]}.join ",&thinsp;") + "\\]", class: 'references'
 
         # If the anchor text is empty, output reference links
         if text.empty?
