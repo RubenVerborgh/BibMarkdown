@@ -62,7 +62,7 @@ module BibMarkdown
 
       # Assign a reference number and create a link to the reference
       number = @references.length + 1
-      link = create_element :a, "\\[#{number}\\]", href: "#ref-#{number}"
+      link = create_element :a, "#{number}", href: "#ref-#{number}"
 
       @references[key] = { id: reference_id(key), number: number, url: url, link: link }
     end
